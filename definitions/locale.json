@@ -1,0 +1,33 @@
+{
+	"__ui__": {
+		"copyPrimary": false,
+		"create": ["_id", "name"],
+		"results": ["_id", "name"],
+		"update": ["name"]
+	},
+
+	"__name__": "Mouth_Locale",
+
+	"_id": {
+		"__type__": "string",
+		"__regex__": "^[a-z]{2}-[A-Z]{2}$",
+		"__ui__": {
+			"title": "ID"
+		}
+	},
+
+	"_archived": {
+		"__type__": "bool",
+		"__optional__": true
+	},
+
+	"_created": {
+		"__type__": "timestamp",
+		"__optional__": true
+	},
+
+	"name": {
+		"__type__": "string",
+		"__maximum__": 64
+	}
+}
