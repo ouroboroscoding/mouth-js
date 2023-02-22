@@ -49,7 +49,6 @@ function fetch() {
  *
  * @name get
  * @access public
- * @returnss list
  */
 export function get() {
     // If we have the data
