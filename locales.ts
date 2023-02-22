@@ -78,9 +78,8 @@ function fetch() {
  *
  * @name get
  * @access public
- * @returnss list
  */
-export function get() {
+export function get(): Locale[] {
 
 	// If we have the data
 	if(_locales !== null) {
