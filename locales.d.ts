@@ -24,9 +24,8 @@ type Callback = (locales: Locale[]) => void;
  *
  * @name get
  * @access public
- * @returnss list
  */
-export declare function get(): any;
+export declare function get(): Locale[];
 /**
  * Sort Array
  *

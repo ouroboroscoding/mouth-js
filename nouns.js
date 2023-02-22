@@ -76,6 +76,41 @@ function localeDelete(_id) {
     });
 }
 /**
+ * Locale Exists
+ *
+ * Returns true if the locale exists, else false
+ *
+ * @name localeExists
+ * @access private
+ * @param _id The ID of the locale to check for
+ * @returns a promise with the results of the request
+ */
+function localeExists(_id) {
+    // Create a new Promise and return it
+    return new Promise((resolve, reject) => {
+        // Make the REST request
+        rest.read('mouth', 'locale/exists', {
+            _id
+        }).done((res) => {
+            // If there's an error
+            if (res.error && !res._handled) {
+                // If we have no reject, or we do and it returns false
+                if (!reject || reject(res.error) === false) {
+                    events.trigger('error', rest.errorMessage(res.error));
+                }
+            }
+            // If there's a warning
+            if (res.warning) {
+                events.trigger('warning', res.warning);
+            }
+            // If there's data
+            if ('data' in res) {
+                resolve(res.data);
+            }
+        });
+    });
+}
+/**
  * Locale read
  *
  * Fetches one or all locales from the service
@@ -514,6 +549,7 @@ const nouns = {
     locale: {
         create: localeCreate,
         delete: localeDelete,
+        exists: localeExists,
         read: localeRead,
         update: localeUpdate
     },

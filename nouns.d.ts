@@ -29,6 +29,17 @@ declare function localeCreate(data: Record<string, any>): Promise<object>;
  */
 declare function localeDelete(_id: string): Promise<object>;
 /**
+ * Locale Exists
+ *
+ * Returns true if the locale exists, else false
+ *
+ * @name localeExists
+ * @access private
+ * @param _id The ID of the locale to check for
+ * @returns a promise with the results of the request
+ */
+declare function localeExists(_id: string): Promise<boolean>;
+/**
  * Locale read
  *
  * Fetches one or all locales from the service
@@ -175,6 +186,7 @@ declare const nouns: {
     locale: {
         create: typeof localeCreate;
         delete: typeof localeDelete;
+        exists: typeof localeExists;
         read: typeof localeRead;
         update: typeof localeUpdate;
     };
