@@ -9,251 +9,192 @@
  */
 
 // Ouroboros modules
-import { clone } from '@ouroboros/tools';
+import Subscribe, { SubscribeCallback, SubscribeReturn } from '@ouroboros/subscribe';
 
 // Local modules
 import nouns from './nouns';
 
-// Locale interface
-interface Locale {
-	_id: string,
-	name: string
-}
-
-// Option interface
-interface Option {
+// Types
+export type Option = {
 	id: string,
 	text: string
 }
-
-// Options type
-type Options = Record<string, Option[]>;
-
-// Callback type
-type Callback = (locales: Locale[]) => void
-
-// Global variables
-const _callbacks: Callback[] = [];
-let _locales: Locale[] | null = null;
-let _running: boolean = false;
+export type Options = Record<string, Option[]>;
 
 /**
- * Fetch
+ * Locales
  *
- * Gets all the locales from the server
+ * Extends the Subscribe class to be created once and exported
  *
- * @name fetch
- * @access private
- * @returns void
+ * @name Locales
+ * @extends Subscribe
  */
-function fetch() {
+class Locales extends Subscribe {
 
-	// If we're not already running
-	if(!_running) {
-		_running = true;
+	// Keeps the state of if the rest request is taking place
+	private running: boolean;
 
-		// Fetch the data from the server
-		nouns.locale.read().then(list => {
+	/**
+	 * Constructor
+	 *
+	 * Creates a new instance
+	 *
+	 * @name Locales
+	 * @access public
+	 * @returns a new instance
+	 */
+	constructor() {
 
-			// If there's data
-			if(list) {
+		// Call the Subscribe constructor with empty data
+		super(null);
 
-				// Store the data
-				_locales = list as Locale[];
+		// Init the running flag
+		this.running = false;
+	}
 
-				// Trigger all callbacks
-				notify();
+	/**
+	 * Array Sort
+	 *
+	 * Splits the records so they are stored by locale and then orders them
+	 * alphabetically
+	 *
+	 * @name arraySort
+	 * @param records The records to sort
+	 * @param idKey The primary key of the records to sort
+	 * @param valueKey The value with locale data in the records
+	 */
+	static arraySort(records: Record<string, any>[], idKey='_id', valueKey='name'): Options {
+
+		// Init the return
+		const oRet: Options = {};
+
+		// Go through each record
+		for(const oRecord of records) {
+
+			// Go through each locale
+			for(const sLocale of Object.keys(oRecord[valueKey])) {
+
+				// If we don't have the locale
+				if(!(sLocale in oRet)) {
+					oRet[sLocale] = [];
+				}
+
+				// Add the ID and text to the list
+				oRet[sLocale].push({
+					id: oRecord[idKey],
+					text: oRecord[valueKey][sLocale]
+				});
 			}
-
-			// Finish running
-			_running = false;
-		});
-	}
-}
-
-/**
- * Get
- *
- * Returns the current list of locales
- *
- * @name get
- * @access public
- */
-export function get(): Locale[] {
-
-	// If we have the data
-	if(_locales !== null) {
-		return clone(_locales);
-	}
-
-	// Return an empty list for now
-	return [];
-}
-
-/**
- * Notify
- *
- * Calls all the callbacks with the current data
- *
- * @name notify
- * @access private
- */
-function notify(): void {
-
-	// Clone the current data
-	const lLocales = clone(_locales);
-
-	// Pass the clone to everyone tracking
-	for(const f of _callbacks) {
-		f(lLocales);
-	}
-}
-
-/**
- * Sort Array
- *
- * Splits the records so they are stored by locale and then orders them
- * alphabetically
- *
- * @name sortArray
- * @access public
- * @param records The records to re-order
- * @param idKey? Optional key for ID value
- * @param valueKey? Optional key for locale values
- * @returns an object of locale keys to option records sorted by the display
- * 			text
- */
-function sortArray(records: Record<string, any>[], idKey='_id', valueKey='locales'): Options {
-
-	// Init the return
-	const oRet: Options = {};
-
-	// Go through each record
-	for(const oRecord of records) {
+		}
 
 		// Go through each locale
-		for(const sLocale of Object.keys(oRecord[valueKey])) {
+		for(const sLocale of Object.keys(oRet)) {
 
-			// If we don't have the locale
-			if(!(sLocale in oRet)) {
-				oRet[sLocale] = [];
-			}
-
-			// Add the ID and text to the list
-			oRet[sLocale].push({
-				id: oRecord[idKey],
-				text: oRecord[valueKey][sLocale]
+			// Sort it alphabetically
+			oRet[sLocale].sort((a, b) => {
+				if(a.text.normalize('NFD') === b.text.normalize('NFD')) return 0;
+				else return (a.text.normalize('NFD') < b.text.normalize('NFD')) ? -1 : 1;
 			});
 		}
+
+		// Return the new structure
+		return oRet;
 	}
 
-	// Go through each locale
-	for(const sLocale of Object.keys(oRet)) {
+	/**
+	 * Object Sort
+	 *
+	 * Splits the records so they are stored by locale and then orders them
+	 * alphabetically
+	 *
+	 * @name sortObject
+	 * @access public
+	 * @param records The records to re-order
+	 * @returns an object of locale keys to option records sorted by the display
+	 * 			text
+	 */
+	static sortObject(records: Record<string, Record<string, string>>): Options {
 
-		// Sort it alphabetically
-		oRet[sLocale].sort((a, b) => {
-			if(a.text.normalize('NFD') === b.text.normalize('NFD')) return 0;
-			else return (a.text.normalize('NFD') < b.text.normalize('NFD')) ? -1 : 1;
-		});
-	}
+		// Init the return
+		const oRet: Options = {};
 
-	// Return the new structure
-	return oRet;
-}
+		// Go through each record
+		for(const sID of Object.keys(records)) {
 
-/**
- * Sort Object
- *
- * Splits the records so they are stored by locale and then orders them
- * alphabetically
- *
- * @name sortObject
- * @access public
- * @param records The records to re-order
- * @returns an object of locale keys to option records sorted by the display
- * 			text
- */
-function sortObject(records: Record<string, Record<string, string>>): Options {
+			// Go through each locale
+			for(const sLocale of Object.keys(records[sID])) {
 
-	// Init the return
-	const oRet: Options = {};
+				// If we don't have the locale
+				if(!(sLocale in oRet)) {
+					oRet[sLocale] = [];
+				}
 
-	// Go through each record
-	for(const sID of Object.keys(records)) {
+				// Add the ID and text to the list
+				oRet[sLocale].push({
+					id: sID,
+					text: records[sID][sLocale]
+				});
+			}
+		}
 
 		// Go through each locale
-		for(const sLocale of Object.keys(records[sID])) {
+		for(const sLocale of Object.keys(oRet)) {
 
-			// If we don't have the locale
-			if(!(sLocale in oRet)) {
-				oRet[sLocale] = [];
-			}
-
-			// Add the ID and text to the list
-			oRet[sLocale].push({
-				id: sID,
-				text: records[sID][sLocale]
+			// Sort it alphabetically
+			oRet[sLocale].sort((a, b) => {
+				if(a.text.normalize('NFD') === b.text.normalize('NFD')) return 0;
+				else return (a.text.normalize('NFD') < b.text.normalize('NFD')) ? -1 : 1;
 			});
 		}
+
+		// Return the new structure
+		return oRet;
 	}
 
-	// Go through each locale
-	for(const sLocale of Object.keys(oRet)) {
+	/**
+	 * Subscribe
+	 *
+	 * Override the subscribe method to initiate the fetching process
+	 *
+	 * @name subscribe
+	 * @access public
+	 */
+	subscribe(callback: SubscribeCallback): SubscribeReturn {
 
-		// Sort it alphabetically
-		oRet[sLocale].sort((a, b) => {
-			if(a.text.normalize('NFD') === b.text.normalize('NFD')) return 0;
-			else return (a.text.normalize('NFD') < b.text.normalize('NFD')) ? -1 : 1;
-		});
-	}
+		// Call the Subscribe subscribe
+		const oReturn = super.subscribe(callback);
 
-	// Return the new structure
-	return oRet;
-}
+		// If we don't have a value yet
+		if(oReturn.data === null) {
 
-/**
- * Subscribe
- *
- * Subscribes to locale changes and returns the current data
- *
- * @name subscribe
- * @access public
- * @param Function callback The callback to register for future updates
- * @returns the current list of locales
- */
-function subscribe(callback: Callback): Locale[] {
+			// Mark us as running
+			this.running = true;
 
-	// Add the callback to the list
-	_callbacks.push(callback);
+			// Fetch the data from the server
+			nouns.locale.read().then(list => {
 
-	// If we have the data
-	if(_locales !== null) {
-		return clone(_locales);
-	}
+				// If there's data
+				if(list) {
 
-	// Fetch the locales
-	fetch();
+					// Trigger all callbacks
+					this.notify(list);
+				}
 
-	// Return an empty list for now
-	return [];
-}
+				// Finish running
+				this.running = false;
+			});
 
-/**
- * Ubsubscribe
- *
- * Removes a callback from the list of who gets notified on changes
- *
- * @name ubsubscribe
- * @access public
- * @param callback The callback to remove
- */
-function unsubscribe(callback: Callback): void {
-	const i = _callbacks.indexOf(callback);
-	if(i > -1) {
-		_callbacks.splice(i, 1);
+			// Overwrite the data
+			oReturn.data = [];
+		}
+
+		// Return the Subscribe result
+		return oReturn;
 	}
 }
+
+// Create an instance of the class
+const locale = new Locales();
 
 // Default export
-const locales = { get, sortArray, sortObject, subscribe, unsubscribe }
-export default locales;
+export default locale;
