@@ -51,13 +51,23 @@ declare class Locales extends Subscribe {
      * Splits the records so they are stored by locale and then orders them
      * alphabetically
      *
-     * @name sortObject
+     * @name objectSort
      * @access public
      * @param records The records to re-order
      * @returns an object of locale keys to option records sorted by the display
      * 			text
      */
-    static sortObject(records: Record<string, Record<string, string>>): Options;
+    static objectSort(records: Record<string, Record<string, string>>): Options;
+    /**
+     * Set
+     *
+     * Called to set the locales locally instead of via the REST call
+     *
+     * @name set
+     * @access public
+     * @param list The new list of locales
+     */
+    set(list: Record<string, any>[]): void;
     /**
      * Subscribe
      *

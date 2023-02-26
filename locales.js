@@ -33,7 +33,7 @@ class Locales extends Subscribe {
      */
     constructor() {
         // Call the Subscribe constructor with empty data
-        super(null);
+        super([]);
         // Init the running flag
         this.running = false;
     }
@@ -85,13 +85,13 @@ class Locales extends Subscribe {
      * Splits the records so they are stored by locale and then orders them
      * alphabetically
      *
-     * @name sortObject
+     * @name objectSort
      * @access public
      * @param records The records to re-order
      * @returns an object of locale keys to option records sorted by the display
      * 			text
      */
-    static sortObject(records) {
+    static objectSort(records) {
         // Init the return
         const oRet = {};
         // Go through each record
@@ -123,6 +123,18 @@ class Locales extends Subscribe {
         return oRet;
     }
     /**
+     * Set
+     *
+     * Called to set the locales locally instead of via the REST call
+     *
+     * @name set
+     * @access public
+     * @param list The new list of locales
+     */
+    set(list) {
+        this.notify(list);
+    }
+    /**
      * Subscribe
      *
      * Override the subscribe method to initiate the fetching process
@@ -133,8 +145,8 @@ class Locales extends Subscribe {
     subscribe(callback) {
         // Call the Subscribe subscribe
         const oReturn = super.subscribe(callback);
-        // If we don't have a value yet
-        if (oReturn.data === null) {
+        // If we don't have a value yet and it's not running
+        if (oReturn.data.length === 0 && this.running === false) {
             // Mark us as running
             this.running = true;
             // Fetch the data from the server
