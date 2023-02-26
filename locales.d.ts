@@ -7,79 +7,76 @@
  * @copyright Ouroboros Coding Inc.
  * @created 2021-03-17
  */
-interface Locale {
-    _id: string;
-    name: string;
-}
-interface Option {
+import Subscribe, { SubscribeCallback, SubscribeReturn } from '@ouroboros/subscribe';
+export type Option = {
     id: string;
     text: string;
-}
-type Options = Record<string, Option[]>;
-type Callback = (locales: Locale[]) => void;
-/**
- * Get
- *
- * Returns the current list of locales
- *
- * @name get
- * @access public
- */
-export declare function get(): Locale[];
-/**
- * Sort Array
- *
- * Splits the records so they are stored by locale and then orders them
- * alphabetically
- *
- * @name sortArray
- * @access public
- * @param records The records to re-order
- * @param idKey? Optional key for ID value
- * @param valueKey? Optional key for locale values
- * @returns an object of locale keys to option records sorted by the display
- * 			text
- */
-declare function sortArray(records: Record<string, any>[], idKey?: string, valueKey?: string): Options;
-/**
- * Sort Object
- *
- * Splits the records so they are stored by locale and then orders them
- * alphabetically
- *
- * @name sortObject
- * @access public
- * @param records The records to re-order
- * @returns an object of locale keys to option records sorted by the display
- * 			text
- */
-declare function sortObject(records: Record<string, Record<string, string>>): Options;
-/**
- * Subscribe
- *
- * Subscribes to locale changes and returns the current data
- *
- * @name subscribe
- * @access public
- * @param Function callback The callback to register for future updates
- * @returns the current list of locales
- */
-declare function subscribe(callback: Callback): Locale[];
-/**
- * Ubsubscribe
- *
- * Removes a callback from the list of who gets notified on changes
- *
- * @name ubsubscribe
- * @access public
- * @param callback The callback to remove
- */
-declare function unsubscribe(callback: Callback): void;
-declare const locales: {
-    get: typeof get;
-    sortArray: typeof sortArray;
-    sortObject: typeof sortObject;
-    subscribe: typeof subscribe;
-    unsubscribe: typeof unsubscribe;
 };
-export default locales;
+export type Options = Record<string, Option[]>;
+/**
+ * Locales
+ *
+ * Extends the Subscribe class to be created once and exported
+ *
+ * @name Locales
+ * @extends Subscribe
+ */
+declare class Locales extends Subscribe {
+    private running;
+    /**
+     * Constructor
+     *
+     * Creates a new instance
+     *
+     * @name Locales
+     * @access public
+     * @returns a new instance
+     */
+    constructor();
+    /**
+     * Array Sort
+     *
+     * Splits the records so they are stored by locale and then orders them
+     * alphabetically
+     *
+     * @name arraySort
+     * @param records The records to sort
+     * @param idKey The primary key of the records to sort
+     * @param valueKey The value with locale data in the records
+     */
+    static arraySort(records: Record<string, any>[], idKey?: string, valueKey?: string): Options;
+    /**
+     * Object Sort
+     *
+     * Splits the records so they are stored by locale and then orders them
+     * alphabetically
+     *
+     * @name objectSort
+     * @access public
+     * @param records The records to re-order
+     * @returns an object of locale keys to option records sorted by the display
+     * 			text
+     */
+    static objectSort(records: Record<string, Record<string, string>>): Options;
+    /**
+     * Set
+     *
+     * Called to set the locales locally instead of via the REST call
+     *
+     * @name set
+     * @access public
+     * @param list The new list of locales
+     */
+    set(list: Record<string, any>[]): void;
+    /**
+     * Subscribe
+     *
+     * Override the subscribe method to initiate the fetching process
+     *
+     * @name subscribe
+     * @access public
+     */
+    subscribe(callback: SubscribeCallback): SubscribeReturn;
+}
+declare const locale: Locales;
+export default locale;
