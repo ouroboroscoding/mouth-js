@@ -29,8 +29,8 @@
 		"__type__": "string",
 		"__maximum__": 65535,
 		"__ui__": {
-			"title": "Content",
-			"type": "textarea"
+			"__title__": "Content",
+			"__type__": "textarea"
 		}
 	}
 }

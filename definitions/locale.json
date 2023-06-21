@@ -1,9 +1,9 @@
 {
 	"__ui__": {
-		"copyPrimary": false,
-		"create": ["_id", "name"],
-		"results": ["_id", "name"],
-		"update": ["name"]
+		"__copyPrimary__": false,
+		"__create__": ["_id", "name"],
+		"__results__": ["_id", "name"],
+		"__update__": ["name"]
 	},
 
 	"__name__": "Mouth_Locale",
@@ -12,7 +12,7 @@
 		"__type__": "string",
 		"__regex__": "^[a-z]{2}-[A-Z]{2}$",
 		"__ui__": {
-			"title": "ID"
+			"__title__": "ID"
 		}
 	},
 
