@@ -34,8 +34,8 @@
 		"__type__": "string",
 		"__maximum__": 65535,
 		"__ui__": {
-			"title": "Plain Text",
-			"type": "textarea"
+			"__title__": "Plain Text",
+			"__type__": "textarea"
 		}
 	},
 
@@ -43,8 +43,8 @@
 		"__type__": "string",
 		"__maximum__": 65535,
 		"__ui__": {
-			"title": "HTML",
-			"type": "textarea"
+			"__title__": "HTML",
+			"__type__": "textarea"
 		}
 	}
 }
