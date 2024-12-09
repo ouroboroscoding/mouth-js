@@ -1,12 +1,12 @@
 {
 	"name": "@ouroboros/mouth",
-	"version": "1.1.1",
+	"version": "1.2.0",
 	"description": "Package to handle the Mouth service.",
-	"main": "src/index.js",
-	"types": "src/index.d.ts",
+	"main": "build/index.js",
+	"types": "build/index.d.ts",
 	"scripts": {
 		"build": "tslint -p tsconfig.json && tsc",
-		"clean": "rm src/*.js src/*.d.ts",
+		"clean": "rm build/*",
 		"for_local": "npm install; tslint -p tsconfig.json && tsc; rm -Rf node_modules",
 		"test": "echo \"Error: no test specified.\" && exit 1"
 	},
@@ -27,6 +27,6 @@
 	},
 	"dependencies": {},
 	"peerDependencies": {
-		"@ouroboros/body": "^1.0.3"
+		"@ouroboros/body": "^1.1.2"
 	}
 }
