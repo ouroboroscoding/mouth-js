@@ -1,0 +1,3 @@
+[submodule "define"]
+	path = define
+	url = git@github.com:ouroboroscoding/mouth2-define
