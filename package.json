@@ -1,6 +1,6 @@
 {
 	"name": "@ouroboros/mouth",
-	"version": "2.1.0",
+	"version": "2.1.1",
 	"description": "Package to handle the Mouth service.",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
@@ -27,6 +27,6 @@
 	},
 	"dependencies": {},
 	"peerDependencies": {
-		"@ouroboros/body": "^1.1.2"
+		"@ouroboros/body": "^1.2.0"
 	}
 }
