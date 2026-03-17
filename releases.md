@@ -1,6 +1,6 @@
 # @ouroboros/mouth releases
 
-## 2.?.?
+## 2.2.0
 - Updated `@ouroboros/body` to latest, a breaking change.
 
 ## 2.1.2

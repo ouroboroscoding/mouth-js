@@ -1,6 +1,6 @@
 {
 	"name": "@ouroboros/mouth",
-	"version": "2.1.2",
+	"version": "2.2.0",
 	"description": "Package to handle the Mouth service.",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
