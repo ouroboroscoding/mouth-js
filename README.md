@@ -51,27 +51,37 @@ if(session) {
 body.create('brain', 'signin', {
   email: 'me@mydomain.com',
   passwd: '********'
-}).then(data => {
+}).then(res => {
+
+  // If we failed
+  if(res.error) {
+    if(res.error.code === errors.SIGNIN_FAILED) {
+      // notify failed signin
+    } else if(res.error.code === errors.BAD_PORTAL) {
+      // notify no access to portal
+    } else {
+      // notify.... uh oh
+    }
+    return;
+  }
 
   // Did we get something back?
-  if(data) {
-    
+  if(res.data) {
+
     // Store session so we can use it on a reload
-    localStorage.setItem('session', data.session);
+    localStorage.setItem('session', res.data.session);
 
     // Let body know we have a session
-    body.session(data.session);
+    body.session(res.data.session);
 
     // Get user
-    body.read('brain', 'user').then(storeUser, handleError);
-  }
-}, error => {
-  if(error.code === errors.SIGNIN_FAILED) {
-    // notify failed signin
-  } else if(error.code === errors.BAD_PORTAL) {
-    // notify no access to portal
-  } else {
-    // notify.... uh oh
+    body.read('brain', 'user').then(res => {
+      if(res.error) {
+        handleError(res.error);
+      } else {
+        storeUser(res.data);
+      }
+    });
   }
 });
 ```
@@ -86,17 +96,20 @@ const locale = {
 	_id: 'en-UK',
 	name: 'English / United Kingdom'
 };
-mouth.create('locale', locale).then(data => {
-	if(data) {
+mouth.create('locale', locale).then(res => {
+	if(res.error) {
+    if(res.error.code === errors.body.DATA_FIELDS) {
+      // error.msg is a list of errors related to the data sent
+    } else if(res.error.code === errors.body.DB_DUPLICATE) {
+      // en-UK already exists
+    } else {
+      // handle other error, check docs
+    }
+    return
+  }
+
+  if(res.data) {
 		// Locale en-UK added
-	}
-}, error => {
-	if(error.code === errors.body.DATA_FIELDS) {
-		// error.msg is a list of errors related to the data sent
-	} else if(error.code === errors.body.DB_DUPLICATE) {
-		// en-UK already exists
-	} else {
-		// handle other error, check docs
 	}
 });
 ```
